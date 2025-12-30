@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V2ray Encoder/Decoder</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="manifest" href="manifest.json" />
+
+</head>
+
+<body>
+  <div class="container">
+    <button id="install-btn" hidden>نصب برنامه</button>
+    <header>
+      <h1>فارسی ساز کانفیگ</h1>
+    </header>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="encode">پنهان سازی</button>
+      <button class="tab-button" data-tab="decode">باز کردن</button>
+    </div>
+    <div class="content">
+      <div id="encode" class="tab-content active">
+        <textarea id="encode-input" placeholder="آدرس کانفیگ رو وارد کن..."></textarea>
+        <div class="mode-selection">
+          <label for="mode-select">مدل پنهان سازی:</label>
+          <select id="mode-select">
+            <option value="simple">ساده (فارسی)</option>
+            <option value="scramble">قاطی پاتی</option>
+            <option value="reverse">معکوس</option>
+          </select>
+        </div>
+        <div class="result-box">
+          <pre id="encode-output"></pre>
+        </div>
+        <button id="encode-copy">کپی</button>
+      </div>
+      <div id="decode" class="tab-content">
+        <textarea id="decode-input" placeholder="آدرس پنهان شده رو وارد کن..."></textarea>
+        <div class="result-box">
+          <pre id="decode-output"></pre>
+        </div>
+        <button id="decode-copy">کپی</button>
+      </div>
+    </div>
+    <footer>
+      <div class="footer-links">
+        <p>فورک از <a href="https://github.com/MahdiMajdian" target="_blank">MahdiMajdian</a></p>
+        <p>توسعه یافته توسط <a href="https://github.com/redo9ion" target="_blank">redo9ion</a></p>
+        <p>تلگرام: <a href="https://t.me/RedO9ion" target="_blank">@RedO9ion</a></p>
+      </div>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>
