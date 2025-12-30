@@ -196,22 +196,39 @@ button:disabled {
 
 footer {
     margin-top: 3rem;
-    padding-top: 1rem;
+    padding: 1.5rem 0;
     border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
 }
 
-.footer-links p {
-    margin: 5px 0;
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 0.9rem;
-    opacity: 0.8;
+}
+
+.footer-row span {
+    opacity: 0.7;
 }
 
 .footer-links a {
     color: var(--accent-color);
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 700;
+    transition: opacity 0.2s;
 }
 
 .footer-links a:hover {
+    opacity: 0.8;
     text-decoration: underline;
 }
