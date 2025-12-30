@@ -1,5 +1,4 @@
-const VERSION = 'v1';
-
+const VERSION = 'v2';
 const CACHE_NAME = `ray-${VERSION}`;
 
 const APP_STATIC_RESOURCES = [
@@ -22,6 +21,39 @@ self.addEventListener('install', (event) => {
 		(async () => {
 			const cache = await caches.open(CACHE_NAME);
 			cache.addAll(APP_STATIC_RESOURCES);
+		})()
+	);
+});
+
+self.addEventListener('activate', (event) => {
+	event.waitUntil(
+		(async () => {
+			const names = await caches.keys();
+			await Promise.all(
+				names.map((name) => {
+					if (name !== CACHE_NAME) {
+						return caches.delete(name);
+					}
+				})
+			);
+			await clients.claim();
+		})()
+	);
+});
+
+self.addEventListener('fetch', (event) => {
+	if (event.request.mode === 'navigate') {
+		event.respondWith(caches.match('/'));
+		return;
+	}
+	event.respondWith(
+		(async () => {
+			const cache = await caches.open(CACHE_NAME);
+			const cachedResponse = await cache.match(event.request);
+			if (cachedResponse) {
+				return cachedResponse;
+			}
+			return fetch(event.request);
 		})()
 	);
 });
