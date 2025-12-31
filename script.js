@@ -91,6 +91,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 '`': '`',
         };
 
+        const meaningfulPersianSentences = [
+                'سلام دوست من',
+                'امروز هوا خوب است',
+                'من دوشنبه رفتم',
+                'کتاب‌های خوبی خوندم',
+                'بازار بسیار شلوغ بود',
+                'شام‌شو خوب پختم',
+                'آسمان آبی و زیبا',
+                'گربه‌ها حیوانات باهوش‌اند',
+                'شام با خانواده خوبی شد',
+                'کار امروز خسته کننده بود',
+                'فیلم خوبی دیدم دیشب',
+                'قهوه صبح‌ها ضروری است',
+                'باغ گل‌های زیبا دارد',
+                'باران خوب بارید دیشب',
+                'موسیقی روح را آرام می‌کند',
+        ];
+
         const toEnMapper = {
                 ش: 'a',
                 ل: 'b',
@@ -185,6 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 result = val.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 1)).join('');
                         } else if (mode === 'reverse') {
                                 result = val.split('').reverse().join('');
+                        } else if (mode === 'meaningful') {
+                                // Encode using meaningful Persian sentences
+                                const bytes = [];
+                                for (let i = 0; i < val.length; i++) {
+                                        bytes.push(val.charCodeAt(i));
+                                }
+                                result = bytes.map((byte, index) => {
+                                        const sentenceIndex = byte % meaningfulPersianSentences.length;
+                                        const sentence = meaningfulPersianSentences[sentenceIndex];
+                                        const posInSentence = index % sentence.length;
+                                        return sentence.charAt(posInSentence) + String(byte);
+                                }).join('|');
                         }
 
                         encodeOutput.textContent = result;
