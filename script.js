@@ -91,23 +91,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 '`': '`',
         };
 
-        const meaningfulPersianSentences = [
-                'سلام دوست من',
-                'امروز هوا خوب است',
-                'من دوشنبه رفتم',
-                'کتاب‌های خوبی خوندم',
-                'بازار بسیار شلوغ بود',
-                'شام‌شو خوب پختم',
-                'آسمان آبی و زیبا',
-                'گربه‌ها حیوانات باهوش‌اند',
-                'شام با خانواده خوبی شد',
-                'کار امروز خسته کننده بود',
-                'فیلم خوبی دیدم دیشب',
-                'قهوه صبح‌ها ضروری است',
-                'باغ گل‌های زیبا دارد',
-                'باران خوب بارید دیشب',
-                'موسیقی روح را آرام می‌کند',
+        const meaningfulPersianWords = [
+                'س', 'خ', 'ع', 'ب', 'ت', 'ث', 'ج', 'چ', 'ح', 'د', 'ذ', 'ر', 'ز', 'ژ', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'پ', 'و', 'ه', 'ی',
         ];
+
+        // Meaningful character obfuscation using Persian letters
+        function obfuscateToMeaningfulSentences(text) {
+                // Convert to Base64 for obfuscation layer
+                const encoded = btoa(text);
+                
+                // Map each character to a Persian letter
+                let result = [];
+                
+                for (let i = 0; i < encoded.length; i++) {
+                        const char = encoded[i];
+                        const charCode = char.charCodeAt(0);
+                        // Use character code to select Persian letter
+                        const letterIndex = charCode % meaningfulPersianWords.length;
+                        const letter = meaningfulPersianWords[letterIndex];
+                        result.push(letter);
+                }
+                
+                return result.join('');
+        }
 
         const toEnMapper = {
                 ش: 'a',
@@ -204,17 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else if (mode === 'reverse') {
                                 result = val.split('').reverse().join('');
                         } else if (mode === 'meaningful') {
-                                // Encode using meaningful Persian sentences
-                                const bytes = [];
-                                for (let i = 0; i < val.length; i++) {
-                                        bytes.push(val.charCodeAt(i));
-                                }
-                                result = bytes.map((byte, index) => {
-                                        const sentenceIndex = byte % meaningfulPersianSentences.length;
-                                        const sentence = meaningfulPersianSentences[sentenceIndex];
-                                        const posInSentence = index % sentence.length;
-                                        return sentence.charAt(posInSentence) + String(byte);
-                                }).join('|');
+                                // Encode using meaningful Persian sentences (Steganography)
+                                result = obfuscateToMeaningfulSentences(val);
                         }
 
                         encodeOutput.textContent = result;
@@ -306,6 +303,73 @@ document.addEventListener('DOMContentLoaded', () => {
                                 encodeCopyButton.textContent = 'Error while copying.';
                         });
         });
+
+        // Save config functionality
+        const encodeSaveButton = document.getElementById('encode-save');
+        const sessionId = 'user-' + Date.now();
+        const savedConfigsList = document.getElementById('saved-configs-list');
+
+        encodeSaveButton.addEventListener('click', async () => {
+                try {
+                        const response = await fetch('/api/save-config', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                        original: encodeInput.value,
+                                        encoded: encodeOutput.textContent,
+                                        mode: modeSelect.value,
+                                        sessionId: sessionId
+                                })
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                                encodeSaveButton.textContent = 'ذخیره شد !';
+                                setTimeout(() => {
+                                        encodeSaveButton.textContent = 'ذخیره';
+                                }, 3000);
+                                loadSavedConfigs();
+                        }
+                } catch (error) {
+                        console.error('Error saving config:', error);
+                }
+        });
+
+        async function loadSavedConfigs() {
+                try {
+                        const response = await fetch('/api/saved-configs/' + sessionId);
+                        const data = await response.json();
+                        savedConfigsList.innerHTML = '';
+                        data.configs.forEach(config => {
+                                const li = document.createElement('li');
+                                const encodedValue = config.encoded.replace(/'/g, "\\'");
+                                const label = config.original.substring(0, 30) + (config.original.length > 30 ? '...' : '');
+                                li.innerHTML = `
+                                        <span class="config-item" onclick="loadConfigToDecoder('${encodedValue}', '${config.id}')">${label}</span>
+                                        <button class="delete-btn" onclick="deleteConfig('${config.id}')">حذف</button>
+                                `;
+                                savedConfigsList.appendChild(li);
+                        });
+                } catch (error) {
+                        console.error('Error loading configs:', error);
+                }
+        }
+
+        window.loadConfigToDecoder = function(encoded, configId) {
+                const decodeInputEl = document.getElementById('decode-input');
+                decodeInputEl.value = encoded;
+                decodeInputEl.dispatchEvent(new Event('input'));
+        };
+
+        window.deleteConfig = async function(id) {
+                try {
+                        await fetch('/api/saved-configs/' + id, { method: 'DELETE' });
+                        loadSavedConfigs();
+                } catch (error) {
+                        console.error('Error deleting config:', error);
+                }
+        };
+
+        loadSavedConfigs();
 
         // PWA Install Button Logic
         const installBtn = document.getElementById('install-btn');
